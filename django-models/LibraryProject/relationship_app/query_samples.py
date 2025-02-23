@@ -29,11 +29,11 @@ def get_books_in_library(library_name):
     except Library.DoesNotExist:
         print(f"Library '{library_name}' not found.")
 
-# Retrieve the librarian for a library
+# Retrieve the librarian for a library using Librarian.objects.get()
 def get_librarian_for_library(library_name):
     try:
         library = Library.objects.get(name=library_name)
-        librarian = library.librarian  # Using OneToOne relationship
+        librarian = Librarian.objects.get(library=library)  # Using get() to retrieve the librarian
         print(f"Librarian for {library_name}: {librarian.name}")
     except Library.DoesNotExist:
         print(f"Library '{library_name}' not found.")
