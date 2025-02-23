@@ -2,16 +2,16 @@ import os
 import django
 
 # Set up Django environment
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'your_project_name.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'LibraryProject.settings')
 django.setup()
 
 from relationship_app.models import Author, Book, Library, Librarian
 
-# Query all books by a specific author
+# Query all books by a specific author using objects.filter()
 def get_books_by_author(author_name):
     try:
         author = Author.objects.get(name=author_name)
-        books = author.books.all()
+        books = Book.objects.filter(author=author)  # Using filter to get books by author
         print(f"Books by {author_name}:")
         for book in books:
             print(book.title)
@@ -22,7 +22,7 @@ def get_books_by_author(author_name):
 def get_books_in_library(library_name):
     try:
         library = Library.objects.get(name=library_name)
-        books = library.books.all()
+        books = library.books.all()  # Using ManyToMany relationship
         print(f"Books in {library_name}:")
         for book in books:
             print(book.title)
@@ -33,7 +33,7 @@ def get_books_in_library(library_name):
 def get_librarian_for_library(library_name):
     try:
         library = Library.objects.get(name=library_name)
-        librarian = library.librarian
+        librarian = library.librarian  # Using OneToOne relationship
         print(f"Librarian for {library_name}: {librarian.name}")
     except Library.DoesNotExist:
         print(f"Library '{library_name}' not found.")
@@ -42,6 +42,11 @@ def get_librarian_for_library(library_name):
 
 # Example usage
 if __name__ == "__main__":
+    # Query all books by a specific author
     get_books_by_author("J.K. Rowling")
+
+    # List all books in a library
     get_books_in_library("Central Library")
+
+    # Retrieve the librarian for a library
     get_librarian_for_library("Central Library")
