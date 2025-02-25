@@ -4,8 +4,11 @@ from django.shortcuts import render, get_object_or_404
 from django.views.generic.detail import DetailView
 from .models import Library, Book
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate, logout
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth import login
+from django.contrib.auth import authenticate
+from django.contrib.auth import logout
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 
 # Function-based view for listing all books
