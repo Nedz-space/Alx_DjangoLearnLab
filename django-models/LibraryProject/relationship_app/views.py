@@ -11,6 +11,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 
 # Function-based view for listing all books
 def list_books(request):
@@ -70,14 +72,26 @@ def check_role(role):
         return user.is_authenticated and hasattr(user, 'userprofile') and user.userprofile.role == role
     return _check
 
-@user_passes_test(check_role('Admin'))
+def check_admin(user):
+    return user.userprofile.role == 'Admin'
+
+def check_librarian(user):
+    return user.userprofile.role == 'Librarian'
+
+def check_member(user):
+    return user.userprofile.role == 'Member'
+
+@login_required
+@user_passes_test(check_admin)
 def admin_view(request):
-    return render(request, 'relationship_app/admin_view.html')
+    return HttpResponse("Welcome, Admin! You have exclusive access.")
 
-@user_passes_test(check_role('Librarian'))
+@login_required
+@user_passes_test(check_librarian)
 def librarian_view(request):
-    return render(request, 'relationship_app/librarian_view.html')
+    return HttpResponse("Welcome, Librarian! You have access to librarian resources.")
 
-@user_passes_test(check_role('Member'))
+@login_required
+@user_passes_test(check_member)
 def member_view(request):
-    return render(request, 'relationship_app/member_view.html')
+    return HttpResponse("Welcome, Member! Enjoy your access.")
