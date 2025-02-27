@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from django.views.generic.detail import DetailView
 from .models import Library, Book
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.contrib.auth import login
 from django.contrib.auth import authenticate
 from django.contrib.auth import logout
@@ -14,6 +14,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
+from django.contrib.auth.decorators import permission_required
+from .forms import BookForm  # Assuming you have a BookForm for creating/editing books
 
 # Function-based view for listing all books
 def list_books(request):
@@ -96,3 +98,44 @@ def librarian_view(request):
 @user_passes_test(check_member)
 def member_view(request):
     return HttpResponse("Welcome, Member! Enjoy your access.")
+
+# Add Book View
+@login_required
+@permission_required('relationship_app.can_add_book', raise_exception=True)
+def add_book(request):
+    if request.method == 'POST':
+        form = BookForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('book_list')  # Redirect to the book list page
+        else:
+            return render(request, 'add_book.html', {'form': form, 'error': 'Invalid data. Please correct the errors below.'})
+    else:
+        form = BookForm()
+    return render(request, 'add_book.html', {'form': form})
+
+# Edit Book View
+@login_required
+@permission_required('relationship_app.can_change_book', raise_exception=True)
+def edit_book(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    if request.method == 'POST':
+        form = BookForm(request.POST, instance=book)
+        if form.is_valid():
+            form.save()
+            return redirect('book_list')  # Redirect to the book list page
+        else:
+            return render(request, 'edit_book.html', {'form': form, 'book': book, 'error': 'Invalid data. Please correct the errors below.'})
+    else:
+        form = BookForm(instance=book)
+    return render(request, 'edit_book.html', {'form': form, 'book': book})
+
+# Delete Book View
+@login_required
+@permission_required('relationship_app.can_delete_book', raise_exception=True)
+def delete_book(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    if request.method == 'POST':
+        book.delete()
+        return redirect('book_list')  # Redirect to the book list page
+    return render(request, 'delete_book.html', {'book': book})
