@@ -26,45 +26,45 @@ class Book(models.Model):
         return self.title
 
 
-class CustomUser(AbstractUser):
-    date_of_birth = models.DateField(null=True, blank=True)
-    profile_photo = models.ImageField(upload_to='profile_photos/', null=True, blank=True)
-
-    def __str__(self):
-        return self.username
 
 class CustomUserManager(BaseUserManager):
     """Manager for CustomUser model with proper user creation methods."""
-    
-    def create_user(self, username, email, password=None, **extra_fields):
+
+    def create_user(self, email, password=None, **extra_fields):
         """Create and return a regular user with an email and password."""
         if not email:
             raise ValueError("The Email field must be set")
         email = self.normalize_email(email)
-        user = self.model(username=username, email=email, **extra_fields)
+        user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, username, email, password=None, **extra_fields):
+    def create_superuser(self, email, password=None, **extra_fields):
         """Create and return a superuser with admin permissions."""
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
-        
+
         if extra_fields.get("is_staff") is not True:
             raise ValueError("Superuser must have is_staff=True.")
         if extra_fields.get("is_superuser") is not True:
             raise ValueError("Superuser must have is_superuser=True.")
 
-        return self.create_user(username, email, password, **extra_fields)
+        return self.create_user(email, password, **extra_fields)
 
 class CustomUser(AbstractUser):
     """Custom User model extending Django's AbstractUser."""
+    
+    username = None  # Remove username completely
     email = models.EmailField(unique=True)
     date_of_birth = models.DateField(null=True, blank=True)
     profile_photo = models.ImageField(upload_to='profile_photos/', null=True, blank=True)
 
     objects = CustomUserManager()  # Attach the custom manager
 
+    USERNAME_FIELD = 'email'  # Email is now used for authentication
+    REQUIRED_FIELDS = []  # No additional required fields
+
     def __str__(self):
-        return self.username
+        return self.email
+
