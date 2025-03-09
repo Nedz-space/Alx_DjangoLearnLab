@@ -1,7 +1,8 @@
 # admin.py
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import Author, Library, Book
+from .models import Author, Library
+from bookshelf.models import Book  # Import from bookshelf
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 
