@@ -6,6 +6,7 @@ from django.http import HttpResponseForbidden
 from .models import Book
 from .forms import SearchForm
 from django.db.models import Q
+from .forms import BookForm, BookSearchForm, ExampleForm
 
 
 def book_list(request):
