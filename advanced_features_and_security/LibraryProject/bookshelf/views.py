@@ -7,6 +7,7 @@ from .models import Book
 from .forms import SearchForm
 from django.db.models import Q
 from .forms import BookForm, BookSearchForm, ExampleForm
+from .forms import ExampleForm
 
 
 def book_list(request):
