@@ -41,6 +41,9 @@ DEBUG = False
 # Define allowed hosts
 ALLOWED_HOSTS = ['yourdomain.com', 'www.yourdomain.com']
 
+# Force HTTPS for all requests
+SECURE_SSL_REDIRECT = True  # Redirect all HTTP requests to HTTPS
+
 # Security settings
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
@@ -50,10 +53,40 @@ X_FRAME_OPTIONS = 'DENY'
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 
-# Optional: HSTS settings (requires HTTPS configured)
+# HSTS settings (requires HTTPS configured)
 SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
+
+"""
+HSTS Explanation:
+- SECURE_HSTS_SECONDS tells browsers to only access the site over HTTPS.
+- SECURE_HSTS_INCLUDE_SUBDOMAINS applies HSTS to all subdomains.
+- SECURE_HSTS_PRELOAD allows inclusion in browsers' preload lists for HSTS.
+"""
+# Cookies are sent only over HTTPS
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+"""
+This ensures that session and CSRF cookies are transmitted only via HTTPS,
+protecting against session hijacking.
+"""
+# Prevent browsers from guessing content types
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Enable browser's built-in XSS protection
+SECURE_BROWSER_XSS_FILTER = True
+
+# Prevent clickjacking by disallowing your site from being embedded in a frame
+X_FRAME_OPTIONS = 'DENY'
+
+"""
+- SECURE_CONTENT_TYPE_NOSNIFF prevents browsers from MIME type sniffing.
+- SECURE_BROWSER_XSS_FILTER enables XSS filtering in browsers.
+- X_FRAME_OPTIONS = 'DENY' prevents the site from being loaded in an iframe, avoiding clickjacking attacks.
+"""
+
 
 
 # Application definition
