@@ -6,10 +6,6 @@ from bookshelf.models import Book  # Import from bookshelf
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 
-@admin.register(Book)
-class BookAdmin(admin.ModelAdmin):
-    list_display = ('title', 'author', 'library', 'publication_year')
-
 def setup_groups():
     """Create groups and assign permissions"""
     editors, _ = Group.objects.get_or_create(name="Editors")
