@@ -86,6 +86,8 @@ X_FRAME_OPTIONS = 'DENY'
 - SECURE_BROWSER_XSS_FILTER enables XSS filtering in browsers.
 - X_FRAME_OPTIONS = 'DENY' prevents the site from being loaded in an iframe, avoiding clickjacking attacks.
 """
+# Enable Django to properly identify secure connections behind a proxy
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 server {
     listen 443 ssl;
