@@ -1,12 +1,10 @@
 #urls script
 
-from django.contrib import admin
-from django.urls import path, include
-
+from django.urls import path
+from .views import BookList
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/', include('api.urls')),  # ✅ This includes your api app routes!
+    path('books/', BookList.as_view(), name='book-list'),
 ]
 
 
