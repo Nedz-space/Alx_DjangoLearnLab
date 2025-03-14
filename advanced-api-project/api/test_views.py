@@ -103,3 +103,7 @@ class BookAPITestCase(APITestCase):
         response = self.client.delete(self.delete_url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+def setUp(self):
+    self.user = User.objects.create_user(username='testuser', password='testpass')
+    self.client.login(username='testuser', password='testpass')
+
