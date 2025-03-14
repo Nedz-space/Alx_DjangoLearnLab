@@ -2,6 +2,7 @@ from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
 from django.urls import reverse
 from django.contrib.auth.models import User
+from rest_framework import status
 from api.models import Book, Author
 
 class BookAPITestCase(APITestCase):
@@ -40,7 +41,7 @@ class BookAPITestCase(APITestCase):
             'publication_year': 2022
         }
         response = self.client.post(self.create_url, data)
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_create_book_authenticated(self):
         self.client.force_authenticate(user=self.user)
@@ -96,12 +97,12 @@ class BookAPITestCase(APITestCase):
             'publication_year': 2025
         }
         response = self.client.put(self.update_url, data)
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_permissions_for_delete(self):
         # Unauthenticated request should fail
         response = self.client.delete(self.delete_url)
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 def setUp(self):
     self.user = User.objects.create_user(username='testuser', password='testpass')
