@@ -5,3 +5,12 @@
     <button type="submit">Update Comment</button>
 </form>
 
+
+<h2>Add a Comment</h2>
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Post Comment</button>
+</form>
+<a href="{% url 'post-detail' post_id %}">Cancel</a>
+
