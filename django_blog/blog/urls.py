@@ -35,7 +35,7 @@ urlpatterns = [
     path('comment/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment-delete'),
 
     # Tags and Search
-    path('tags/<slug:slug>/', PostByTagListView.as_view(), name='posts-by-tag'),  # ✅ Corrected
+    path('tags/<slug:tag_slug>/', PostByTagListView.as_view(), name='posts-by-tag'),
     path('search/', search_posts, name='post-search'),
 ]
 
