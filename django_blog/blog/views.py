@@ -1,22 +1,20 @@
 # Create your views here.
 
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import UserRegisterForm
 from django.views.generic import (
     ListView, DetailView,
     CreateView, UpdateView, DeleteView
 )
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.urls import reverse_lazy
-from .models import Post, Comment
-from .forms import CommentForm
-from django.urls import reverse_lazy
-from django.urls import reverse
+from django.urls import reverse_lazy, reverse
 from django.db.models import Q
 from taggit.models import Tag
+from .forms import UserRegisterForm, CommentForm
+from .models import Post, Comment
 
 
 def register(request):
@@ -31,6 +29,7 @@ def register(request):
         form = UserRegisterForm()
     return render(request, 'blog/register.html', {'form': form})
 
+
 @login_required
 def profile(request):
     return render(request, 'blog/profile.html')
@@ -43,29 +42,32 @@ class PostListView(ListView):
     context_object_name = 'posts'
     ordering = ['-created_at']  # latest posts first
 
+
 # Post detail view (public)
 class PostDetailView(DetailView):
     model = Post
     template_name = 'blog/post_detail.html'  # template path
     context_object_name = 'post'
 
+
 # Create a post (login required)
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
     fields = ['title', 'content']
     template_name = 'blog/post_form.html'
-    form_class = 'PostForm'
+    form_class = 'PostForm'  # You should import PostForm if you haven't already
 
     def form_valid(self, form):
         form.instance.author = self.request.user
         return super().form_valid(form)
+
 
 # Update a post (author only)
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
     fields = ['title', 'content']
     template_name = 'blog/post_form.html'
-    form_class = 'PostForm'
+    form_class = 'PostForm'  # You should import PostForm if you haven't already
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -74,6 +76,7 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def test_func(self):
         post = self.get_object()
         return self.request.user == post.author
+
 
 # Delete a post (author only)
 class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
@@ -85,6 +88,8 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         post = self.get_object()
         return self.request.user == post.author
 
+
+# Create comment (login required)
 class CommentCreateView(LoginRequiredMixin, CreateView):
     model = Comment
     form_class = CommentForm
@@ -100,6 +105,8 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         return reverse('post-detail', kwargs={'pk': self.kwargs['post_id']})
 
+
+# Update comment (author only)
 class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Comment
     fields = ['content']
@@ -113,6 +120,8 @@ class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         comment = self.get_object()
         return self.request.user == comment.author
 
+
+# Delete comment (author only)
 class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Comment
     template_name = 'blog/comment_confirm_delete.html'
@@ -124,6 +133,8 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         comment = self.get_object()
         return self.request.user == comment.author
 
+
+# Search posts
 def search_posts(request):
     query = request.GET.get('q')
     results = []
@@ -133,13 +144,15 @@ def search_posts(request):
             Q(content__icontains=query) |
             Q(tags__name__icontains=query)
         ).distinct()
-    
+
     context = {
         'query': query,
         'results': results
     }
     return render(request, 'blog/search_results.html', context)
 
+
+# Posts filtered by tag (function-based view version, optional)
 def posts_by_tag(request, slug):
     tag = get_object_or_404(Tag, slug=slug)
     posts = Post.objects.filter(tags=tag)
@@ -149,3 +162,22 @@ def posts_by_tag(request, slug):
         'posts': posts
     }
     return render(request, 'blog/posts_by_tag.html', context)
+
+
+#  Posts filtered by tag (class-based view version)
+class PostByTagListView(ListView):
+    model = Post
+    template_name = 'blog/posts_by_tag.html'
+    context_object_name = 'posts'
+    paginate_by = 5  # Optional: paginate results
+
+    def get_queryset(self):
+        slug = self.kwargs.get('slug')
+        return Post.objects.filter(tags__slug=slug).order_by('-created_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        slug = self.kwargs.get('slug')
+        context['tag'] = get_object_or_404(Tag, slug=slug)
+        return context
+
