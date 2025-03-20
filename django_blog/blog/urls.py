@@ -3,7 +3,7 @@ from django.contrib.auth import views as auth_views
 from . import views
 from .views import (
     PostListView, PostDetailView,
-    PostCreateView, PostUpdateView, PostDeleteView, CommentCreateView, CommentUpdateView, CommentDeleteView
+    PostCreateView, PostUpdateView, PostDeleteView, CommentCreateView, CommentUpdateView, CommentDeleteView, PostByTagListView, search_posts
 )
 from . import views
 
