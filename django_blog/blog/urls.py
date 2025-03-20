@@ -7,12 +7,14 @@ from .views import (
 )
 from . import views
 
+
 urlpatterns = [
     path('register/', views.register, name='register'),
     path('login/', auth_views.LoginView.as_view(template_name='blog/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(template_name='blog/logout.html'), name='logout'),
     path('profile/', views.profile, name='profile'),
-     # List all posts
+
+    # List all posts
     path('', PostListView.as_view(), name='post-list'),
 
     # Create a new post
@@ -33,7 +35,7 @@ urlpatterns = [
     path('comment/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment-delete'),
 
     # Tags and Search
-    path('tags/<slug:slug>/', posts_by_tag, name='posts-by-tag'),
+    path('tags/<slug:slug>/', PostByTagListView.as_view(), name='posts-by-tag'),  # ✅ Corrected
     path('search/', search_posts, name='post-search'),
 ]
 
