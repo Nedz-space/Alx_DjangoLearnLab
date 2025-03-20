@@ -15,6 +15,8 @@ from .models import Post, Comment
 from .forms import CommentForm
 from django.urls import reverse_lazy
 from django.urls import reverse
+from django.db.models import Q
+from taggit.models import Tag
 
 
 def register(request):
@@ -121,3 +123,29 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         comment = self.get_object()
         return self.request.user == comment.author
+
+def search_posts(request):
+    query = request.GET.get('q')
+    results = []
+    if query:
+        results = Post.objects.filter(
+            Q(title__icontains=query) |
+            Q(content__icontains=query) |
+            Q(tags__name__icontains=query)
+        ).distinct()
+    
+    context = {
+        'query': query,
+        'results': results
+    }
+    return render(request, 'blog/search_results.html', context)
+
+def posts_by_tag(request, slug):
+    tag = get_object_or_404(Tag, slug=slug)
+    posts = Post.objects.filter(tags=tag)
+
+    context = {
+        'tag': tag,
+        'posts': posts
+    }
+    return render(request, 'blog/posts_by_tag.html', context)

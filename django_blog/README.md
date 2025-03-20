@@ -18,3 +18,18 @@
 - Make sure to apply migrations: `python manage.py makemigrations` and `migrate`
 - Start the server: `python manage.py runserver`
 
+
+## Tagging and Search Features
+
+### Adding Tags to Posts
+- Create or edit a post.
+- Enter tags in the "Tags" field. Separate tags with commas.
+
+### Viewing Posts by Tag
+- Click on any tag displayed in the post detail view.
+- You will be redirected to a page listing all posts with that tag.
+
+### Searching Posts
+- Use the search bar to look for posts.
+- You can search by title, content, or tags.
+
