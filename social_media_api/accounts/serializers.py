@@ -4,13 +4,14 @@ from rest_framework.authtoken.models import Token
 
 User = get_user_model()
 
-class UserSerializer(serializers.ModelSerializer):
-    """Serializer for the user model, handling user registration."""
+
+class RegisterSerializer(serializers.ModelSerializer):
+    """Serializer for user registration."""
     password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password', 'bio', 'profile_picture']
+        fields = ['id', 'username', 'email', 'password']
 
     def create(self, validated_data):
         """Create and return a new user with a hashed password and generate an auth token."""
@@ -19,9 +20,15 @@ class UserSerializer(serializers.ModelSerializer):
             email=validated_data.get('email', ''),
             password=validated_data['password']
         )
-        # Create an authentication token for the newly created user
         token = Token.objects.create(user=user)
         return {"user": user, "token": token.key}
+
+
+class UserSerializer(serializers.ModelSerializer):
+    """Serializer for retrieving user details."""
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'bio', 'profile_picture']
 
 
 class LoginSerializer(serializers.Serializer):
@@ -34,8 +41,7 @@ class LoginSerializer(serializers.Serializer):
         user = authenticate(username=data['username'], password=data['password'])
         if not user:
             raise serializers.ValidationError("Invalid username or password.")
-        
-        # Retrieve or create an authentication token
+
         token, created = Token.objects.get_or_create(user=user)
         return {"token": token.key, "user": UserSerializer(user).data}
 
