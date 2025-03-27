@@ -14,14 +14,13 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'email', 'password']
 
     def create(self, validated_data):
-        """Create and return a new user with a hashed password and generate an auth token."""
+        """Create and return a new user with a hashed password."""
         user = User.objects.create_user(
             username=validated_data['username'],
             email=validated_data.get('email', ''),
             password=validated_data['password']
         )
-        token = Token.objects.create(user=user)
-        return {"user": user, "token": token.key}
+        return user  # Return only the user instance, not a dictionary
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -43,5 +42,5 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError("Invalid username or password.")
 
         token, created = Token.objects.get_or_create(user=user)
-        return {"token": token.key, "user": UserSerializer(user).data}
+        return {"token": token.key, "user": UserSerializer(user).data}  # Ensure return statement
 
