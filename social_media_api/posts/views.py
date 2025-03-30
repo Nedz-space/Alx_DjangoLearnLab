@@ -1,19 +1,23 @@
 
 # Create your views here.
 
-from rest_framework import viewsets, permissions, status
-from .models import Post, Comment, Like
-from .serializers import PostSerializer, CommentSerializer, LikeSerializer
-from rest_framework import filters
+from rest_framework import viewsets, permissions, status, filters
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from notifications.utils import create_notification  # Import from notifications
+from django.shortcuts import get_object_or_404
+from .models import Post, Comment, Like
+from .serializers import PostSerializer, CommentSerializer, LikeSerializer
+from notifications.utils import create_notification  # Ensure this function exists
 
 class PostViewSet(viewsets.ModelViewSet):
     """Viewset for managing posts."""
     queryset = Post.objects.all().order_by('-created_at')
     serializer_class = PostSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    # ✅ Add filtering
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['title', 'content']
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -27,12 +31,8 @@ class CommentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-class PostViewSet(viewsets.ModelViewSet):
-    ...
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['title', 'content']
-
 class LikeViewSet(viewsets.ModelViewSet):
+    """Viewset for managing likes."""
     serializer_class = LikeSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -42,11 +42,13 @@ class LikeViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'])
     def like(self, request, pk=None):
         """Like a post"""
-        post = Post.objects.get(pk=pk)
+        post = get_object_or_404(Post, pk=pk)  # ✅ Ensure post exists
         like, created = Like.objects.get_or_create(user=request.user, post=post)
+
         if created:
-            create_notification(post.author, request.user, 'liked your post', post)
+            create_notification(post.author, request.user, 'liked your post', post)  # ✅ Ensure function exists
             return Response({'message': 'Post liked'}, status=status.HTTP_201_CREATED)
+
         return Response({'message': 'Already liked'}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['post'])
